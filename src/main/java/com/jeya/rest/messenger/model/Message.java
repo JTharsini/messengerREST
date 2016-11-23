@@ -1,5 +1,6 @@
 package com.jeya.rest.messenger.model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -21,6 +22,7 @@ public class Message {
 		this.id = id;
 		this.message = message;
 		this.author = author;
+		this.created = Calendar.getInstance().getTime();
 	}
 	
 	public long getId() {
