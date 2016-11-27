@@ -2,6 +2,7 @@ package com.jeya.rest.messenger.resources;
 
 import java.util.List;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,10 +11,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.jeya.rest.messenger.model.Message;
+import com.jeya.rest.messenger.resources.beans.MessageFilterBean;
 import com.jeya.rest.messenger.service.MessageService;
 
 // http://localhost:8080/messenger/webapi/messages/
@@ -23,15 +24,16 @@ public class MessageResource {
 	
 	MessageService messageService = new MessageService();
 	
+	// to avoid having more param in method header, create separate class and use that
 	@GET
-	public List<Message> getMessages(@QueryParam("year") int year,@QueryParam("start") int start,@QueryParam("size") int size)
+	public List<Message> getMessages(@BeanParam MessageFilterBean filterBean)
 	{
-		if(year > 0){
-			return messageService.getMessagesForYear(year);
+		if(filterBean.getYear() > 0){
+			return messageService.getMessagesForYear(filterBean.getYear());
 		}
-		if(start == 0 && size > 0)
+		if(filterBean.getStart() == 0 && filterBean.getSize() > 0)
 		{
-			return messageService.getMessagesPaginated(start, size);
+			return messageService.getMessagesPaginated(filterBean.getStart(), filterBean.getSize());
 		}
 		return messageService.getAllMessages();
 	}
@@ -65,6 +67,14 @@ public class MessageResource {
 	public void deleteMessage(@PathParam("messageId") long id)
 	{
 		messageService.removeMessage(id);
+	}
+	
+	// in this point jersey will know that I need to look up another class
+	// since the return type is instance of another class
+	@Path("/{messageId}/comments")
+	public CommentResource getCommentResource()
+	{
+		return new CommentResource();
 	}
 	
 /*	@GET
